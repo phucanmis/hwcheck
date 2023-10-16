@@ -17,8 +17,15 @@ check_ram_speed() {
     apt install -y dmidecode
   fi
 
-  # Fetch RAM speed
-  dmidecode -t memory | grep -i 'Speed:' | awk '{print $2, $3}'
+  # Print header for the table
+  printf "%-10s %-10s %-10s\n" "Position" "Speed(MHz)" "Manufacturer"
+
+  # Fetch and format RAM information
+  count=1
+  dmidecode -t memory | awk -F: '/Size: [0-9]/ {size=$2} /Speed: [0-9]/ {speed=$2; print size, speed}' | while read -r size speed; do
+    printf "%-10d %-10s %-10s\n" $count "$speed" "$size"
+    ((count++))
+  done
 }
 
 # Call function to check RAM speed
